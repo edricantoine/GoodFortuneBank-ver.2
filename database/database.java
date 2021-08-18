@@ -24,6 +24,7 @@ public class database implements Serializable {
     public static JButton button = new JButton("Login");
     public static JButton buttonCA = new JButton("Create Account");
     public static JButton buttonQ = new JButton("Quit");
+    public static JButton options = new JButton("Options");
 
     /**Constants for the Create Account screen */
     public static JFrame cframe = new JFrame("Good Fortune Bank");
@@ -52,7 +53,22 @@ public class database implements Serializable {
     /**DecimalFormat for deposit & withdrawal textboxes */
     public static DecimalFormat cd = new DecimalFormat("#.00");
 
-    /**Saving data stuff */
+    /**Constants for the options screen */
+    public static JFrame opFrame = new JFrame("Options");
+    public static JPanel opPanel = new JPanel();
+    public static JButton deleteButton = new JButton("Delete one account");
+    public static JButton opBack = new JButton("Back");
+
+    /** Constants for the delete account screeen */
+
+    public static JFrame delFrame = new JFrame("Delete an account");
+    public static JPanel delPanel = new JPanel();
+    public static JLabel delLabel = new JLabel("Enter the username and password of the account you wish to delete.");
+    public static JTextField delUser = new JTextField(20);
+    public static JPasswordField delPass = new JPasswordField(20);
+    public static JButton delButton = new JButton("Delete Account");
+    public static JButton delBack = new JButton("Back");
+    
     
     
 
@@ -575,8 +591,13 @@ public class database implements Serializable {
         buttonCA.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(buttonCA);
 
+        options.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(options);
+
         buttonQ.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(buttonQ);
+
+        
 
         frame.getContentPane().add(panel); 
         frame.pack();
@@ -591,6 +612,19 @@ public class database implements Serializable {
                 frame.setVisible(false);
                 
                 cframe.setVisible(true);
+
+
+            }
+
+        });
+
+        options.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                frame.setVisible(false);
+                opFrame.setVisible(true);
 
 
             }
@@ -733,6 +767,7 @@ public class database implements Serializable {
          createdPanel.add(okButton);
          createdFrame.getContentPane().add(createdPanel);
          createdFrame.setLocationRelativeTo(null);
+         createdFrame.pack();
 
          okButton.addActionListener(new ActionListener() {
 
@@ -831,9 +866,145 @@ public class database implements Serializable {
 
         });
 
+        /** Options screen settings */
+
+        opFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        opFrame.setSize(300, 300);
+        opFrame.setLocationRelativeTo(null);
+        opPanel.setLayout(new BoxLayout(opPanel, BoxLayout.Y_AXIS));
+        opBack.setAlignmentX(Component.CENTER_ALIGNMENT);
+        deleteButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        opPanel.add(deleteButton);
+        opPanel.add(opBack);
+        opFrame.getContentPane().add(opPanel);
+        opFrame.pack();
+
+        opBack.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                opFrame.setVisible(false);
+                
+                frame.setVisible(true);
+
+
+            }
+
+        });
+
+        deleteButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                opFrame.setVisible(false);
+                
+                delFrame.setVisible(true);
+
+
+            }
+
+        });
+
+        /** Delete account screen settings */
+
+        delFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        delFrame.setSize(300, 300);
+        delFrame.setLocationRelativeTo(null);
+        delPanel.setLayout(new BoxLayout(delPanel, BoxLayout.Y_AXIS));
+        delLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        delUser.setAlignmentX(Component.CENTER_ALIGNMENT);
+        delPass.setAlignmentX(Component.CENTER_ALIGNMENT);
+        delButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        delBack.setAlignmentX(Component.CENTER_ALIGNMENT);
         
 
-       
+        delPanel.add(delLabel);
+        delPanel.add(delUser);
+        delPanel.add(delPass);
+        delPanel.add(delButton);
+        delPanel.add(delBack);
+
+        delFrame.getContentPane().add(delPanel);
+
+        delFrame.pack();
+
+        delBack.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                delLabel.setText("Enter the username and password of the account you wish to delete.");
+                
+
+                delFrame.setVisible(false);
+                
+                opFrame.setVisible(true);
+
+
+            }
+
+        });
+
+        delButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                final String deleteName;
+                final String deletePass;
+
+                deleteName = delUser.getText();
+                deletePass = new String(delPass.getPassword());
+
+                if(!nameList.contains(deleteName)) {
+                    delLabel.setText("No account with that name found.");
+                } else {
+
+                for(database d : userList) {
+                    if(d.name.equals(deleteName) && d.pass.equals(deletePass)) {
+                        delLabel.setText("Account successfully deleted.");
+                        userList.remove(d);
+                        nameList.remove(d.name);
+                        try {
+                            FileOutputStream writeData = new FileOutputStream("bankdata.ser");
+                            ObjectOutputStream writeStream = new ObjectOutputStream(writeData);
+                            writeStream.writeObject(userList);
+                            writeStream.flush();
+                            writeStream.close();
+                        } catch(IOException f) {
+                            f.printStackTrace();
+                        }
+                
+                        try {
+                            FileOutputStream writeName = new FileOutputStream("namedata.ser");
+                            ObjectOutputStream nameStream = new ObjectOutputStream(writeName);
+                            nameStream.writeObject(nameList);
+                            nameStream.flush();
+                            nameStream.close();
+                
+                        } catch(IOException f) {
+                            f.printStackTrace();
+                        }
+                        break;
+                    }
+                }
+            }
+
+                
+
+                delUser.setText("");
+                delPass.setText("");
+
+
+
+
+            }
+
+        });
+        
+
 
     }
         
